@@ -1,0 +1,2741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOICENOX — Intelligent Audio Workspace</title>
+
+    <style>
+        /* ==========================================================================
+           VOICENOX THEME ENGINE V1.0
+           ========================================================================== */
+
+        :root {
+            --bg-workspace: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --panel-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-glow: #6366f1;
+            --btn-success: #10b981;
+            --btn-danger: #ef4444;
+            --btn-warning: #f59e0b;
+            --border-subtle: #e2e8f0;
+            --sidebar-item-hover: #1e293b;
+            --sidebar-item-active: #312e81;
+            --input-bg-override: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-workspace: #0f172a;
+            --bg-sidebar: #1e293b;
+            --panel-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: #334155;
+            --sidebar-item-hover: #334155;
+            --sidebar-item-active: #4f46e5;
+            --input-bg-override: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI",
+            Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-workspace);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* ==========================================================================
+           AUTHENTICATION
+           ========================================================================== */
+
+        .auth-screen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0f172a;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .auth-card {
+            width: 380px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.55);
+            color: #f8fafc;
+        }
+
+        .auth-card h2 {
+            margin: 0 0 6px 0;
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .auth-card h2 span {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-subtitle {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .auth-form-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .auth-form-group input {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .auth-form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .auth-submit-btn:hover {
+            background: #6366f1;
+            transform: translateY(-1px);
+        }
+
+        .auth-switch-prompt {
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+
+        .auth-switch-prompt a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-switch-prompt a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==========================================================================
+           SIDEBAR
+           ========================================================================== */
+
+        .sidebar {
+            width: 340px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08);
+            z-index: 10;
+            transition: background-color 0.25s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+        }
+
+        .search-box {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #f8fafc;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-glow);
+        }
+
+        .date-filter-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .date-filter-group input[type="date"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #e2e8f0;
+            color-scheme: dark;
+        }
+
+        .clear-btn {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .notes-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .note-item {
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .note-item:hover {
+            background: var(--sidebar-item-hover);
+        }
+
+        .note-item.active {
+            background: var(--sidebar-item-active);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .note-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #f1f5f9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-item-date {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* ==========================================================================
+           MAIN WORKSPACE
+           ========================================================================== */
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .premium-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .brand-title span {
+            background: linear-gradient(135deg, var(--accent-glow), #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-badge {
+            font-size: 11px;
+            background: #312e81;
+            color: #c7d2fe;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* ==========================================================================
+           CONTROL PANEL
+           ========================================================================== */
+
+        .control-panel {
+            padding: 24px;
+            background: var(--panel-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: background-color 0.25s ease,
+            border-color 0.25s ease;
+        }
+
+        .active-note-banner {
+            width: 100%;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 4px;
+        }
+
+        .active-note-banner strong {
+            color: var(--accent-glow);
+        }
+
+        .control-panel-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            width: 100%;
+        }
+
+        button.action-btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #startButton {
+            background-color: var(--btn-success);
+            color: white;
+        }
+
+        #appendButton {
+            background-color: var(--accent-glow);
+            color: white;
+        }
+
+        #stopButton {
+            background-color: var(--btn-danger);
+            color: white;
+        }
+
+        #saveButton {
+            background-color: var(--btn-warning);
+            color: white;
+        }
+
+        #renameButton {
+            background-color: #475569;
+            color: white;
+        }
+
+        #deleteButton {
+            background-color: transparent;
+            color: var(--btn-danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        button.action-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        #deleteButton:hover:not(:disabled) {
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        button:disabled {
+            background-color: var(--border-subtle) !important;
+            color: var(--text-muted) !important;
+            border: 1px solid var(--border-subtle) !important;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: none !important;
+        }
+
+        #status {
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: var(--bg-workspace);
+            color: var(--text-main);
+            font-weight: 600;
+            border: 1px solid var(--border-subtle);
+            transition: background-color 0.25s ease,
+            color 0.25s ease;
+        }
+
+        .recording-active {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+            color: var(--btn-danger) !important;
+            border-color: rgba(239, 68, 68, 0.2) !important;
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        /* ==========================================================================
+           EDITOR
+           ========================================================================== */
+
+        .editor-container {
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-card);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border-subtle);
+            transition: background-color 0.25s ease,
+            border-color 0.25s ease;
+        }
+
+        #transcript {
+            width: 100%;
+            height: 160px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.7;
+            resize: vertical;
+            background-color: var(--input-bg-override);
+            color: var(--text-main);
+            transition: background-color 0.25s ease,
+            color 0.25s ease,
+            border-color 0.25s ease;
+        }
+
+        #transcript:focus {
+            border-color: var(--accent-glow);
+            outline: none;
+        }
+
+        /* ==========================================================================
+           AUDIO TRACKS
+           ========================================================================== */
+
+        .audio-tracks-panel {
+            background: var(--panel-card);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border-subtle);
+            transition: background-color 0.25s ease,
+            border-color 0.25s ease;
+        }
+
+        .audio-tracks-panel h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tracks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .track-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-workspace);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            transition: background-color 0.25s ease,
+            border-color 0.25s ease;
+        }
+
+        .track-info {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        audio {
+            height: 32px;
+            width: 300px;
+        }
+
+        .info-tag {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ==========================================================================
+     AUTHENTICATION OVERLAY
+     ========================================================================== -->
+
+<div id="authOverlay" class="auth-screen-overlay">
+
+    <div class="auth-card" id="authCard">
+
+        <h2 id="authTitle">
+            🎙️ <span>VOICENOX</span> Login
+        </h2>
+
+        <p class="auth-subtitle" id="authSubtitle">
+            Access your isolated security workspace node.
+        </p>
+
+        <form id="authForm" onsubmit="handleAuthSubmit(event)">
+
+            <div class="auth-form-group">
+
+                <label for="authUsername">
+                    Email Handle
+                </label>
+
+                <input
+                        type="email"
+                        id="authUsername"
+                        placeholder="yourname@domain.com"
+                        required
+                        autocomplete="username"
+                >
+
+            </div>
+
+            <div class="auth-form-group">
+
+                <label for="authPassword">
+                    Password
+                </label>
+
+                <div style="position: relative; display: flex; align-items: center; width: 100%;">
+
+                    <input
+                            type="password"
+                            id="authPassword"
+                            placeholder="••••••••••••"
+                            required
+                            autocomplete="current-password"
+                            style="width: 100%; padding-right: 42px;"
+                    >
+
+                    <span
+                            id="togglePasswordVisibilityBtn"
+                            onclick="togglePasswordInputMask()"
+                            style="position: absolute;
+                               right: 14px;
+                               top: 50%;
+                               transform: translateY(-50%);
+                               cursor: pointer;
+                               font-size: 16px;
+                               user-select: none;
+                               color: #94a3b8;
+                               line-height: 1;">
+                        👁️
+                    </span>
+
+                </div>
+
+            </div>
+
+            <button
+                    type="submit"
+                    id="authSubmitBtn"
+                    class="auth-submit-btn">
+                Authorize Session
+            </button>
+
+        </form>
+
+        <div class="auth-switch-prompt" id="authSwitchPrompt">
+            New node variant?
+            <a href="#" onclick="toggleAuthState(event)">
+                Register clean handle
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================================
+     LEFT SIDEBAR
+     ========================================================================== -->
+
+<div class="sidebar">
+
+    <div class="sidebar-header">
+        <h3>📂 Journal Stream Engine</h3>
+    </div>
+
+    <div class="search-box">
+
+        <input
+                type="text"
+                id="searchKeyword"
+                placeholder="🔍 Search transcript index..."
+        >
+
+        <div class="date-filter-group">
+
+            <input
+                    type="date"
+                    id="filterDate"
+            >
+
+            <button
+                    id="clearFilterBtn"
+                    class="clear-btn">
+                Reset
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="notes-list" id="notesList">
+
+        <div style="text-align:center;
+                    padding:40px;
+                    color:#64748b;
+                    font-size:13px;">
+            Syncing stream...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================================
+     RIGHT MAIN WORKSPACE
+     ========================================================================== -->
+
+<div class="main-content">
+
+    <div class="premium-header">
+
+        <h1 class="brand-title">
+            🎙️ <span>VOICENOX</span> Intelligent Workspace
+        </h1>
+
+        <div style="display: flex;
+                    align-items: center;
+                    gap: 14px;">
+
+            <button
+                    id="logoutBtn"
+                    onclick="terminateUserSession()"
+                    style="padding: 6px 12px;
+                       border-radius: 20px;
+                       cursor: pointer;
+                       border: 1px solid rgba(239, 68, 68, 0.2);
+                       background: transparent;
+                       color: var(--btn-danger);
+                       font-weight: 600;
+                       font-size: 12px;
+                       display: inline-flex;
+                       align-items: center;
+                       gap: 6px;
+                       transition: all 0.2s ease;">
+                🔒 Logout
+            </button>
+
+            <button
+                    id="themeToggleBtn"
+                    style="padding: 6px 12px;
+                       border-radius: 20px;
+                       cursor: pointer;
+                       border: 1px solid var(--border-subtle);
+                       background: var(--panel-card);
+                       color: var(--text-main);
+                       font-weight: 600;
+                       font-size: 12px;
+                       display: inline-flex;
+                       align-items: center;
+                       gap: 6px;
+                       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                       transition: all 0.2s ease;">
+
+                <span id="themeToggleIcon">
+                    🖤
+                </span>
+
+                <span id="themeToggleText">
+                    Black Mode
+                </span>
+
+            </button>
+
+            <div class="brand-badge">
+                ENGINE v1.0.0 (STABLE)
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================================================
+         CONTROL PANEL
+         ========================================================================== -->
+
+    <div class="control-panel">
+
+        <div class="active-note-banner" id="activeNoteBanner">
+            ⚡ System: Initialized empty scratchpad buffer block.
+        </div>
+
+
+        <!-- ROW 1 -->
+
+        <div class="control-panel-row">
+
+            <button
+                    id="startButton"
+                    class="action-btn">
+                ✨ New Note
+            </button>
+
+            <button
+                    id="appendButton"
+                    class="action-btn"
+                    disabled>
+                🧬 Append Audio
+            </button>
+
+            <button
+                    id="stopButton"
+                    class="action-btn"
+                    disabled>
+                🛑 Stop Stream
+            </button>
+
+            <div style="flex-grow: 1;"></div>
+
+            <div id="status">
+                Status: Idle
+            </div>
+
+        </div>
+
+
+        <!-- ROW 2 -->
+
+        <div
+                class="control-panel-row"
+                style="padding-top: 10px;
+                   border-top: 1px dashed var(--border-subtle);">
+
+            <button
+                    id="saveButton"
+                    class="action-btn"
+                    disabled>
+                💾 Commit Changes
+            </button>
+
+            <button
+                    id="renameButton"
+                    class="action-btn"
+                    disabled>
+                ✏️ Rename
+            </button>
+
+            <div style="flex-grow: 1;"></div>
+
+            <button
+                    id="deleteButton"
+                    class="action-btn"
+                    disabled>
+                🗑️ Delete Note
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================================================
+         TRANSCRIPT EDITOR
+         ========================================================================== -->
+
+    <div class="editor-container">
+
+        <h3>
+            Live Matrix Transcription
+        </h3>
+
+        <p class="info-tag">
+            Text is fully hot-editable at any point.
+        </p>
+
+        <textarea
+                id="transcript"
+                placeholder="Your live audio processing text will stream here..."
+        ></textarea>
+
+    </div>
+
+
+    <!-- ==========================================================================
+         AUDIO PLAYBACK
+         ========================================================================== -->
+
+    <div class="audio-tracks-panel">
+
+        <h3>
+            🎵 Attached Voice Recordings
+        </h3>
+
+        <div
+                class="tracks-container"
+                id="tracksContainer">
+
+            <div style="color:var(--text-muted);
+                        font-size:13px;
+                        font-style:italic;">
+                Select a note from history to view voice tracks.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* ==========================================================================
+       GLOBAL STATE
+       ========================================================================== */
+
+    let socket = null;
+
+    let mediaRecorder = null;
+
+    let microphoneStream = null;
+
+    let audioChunks = [];
+
+    let currentNoteId = null;
+
+    let isLoginState = true;
+
+    let currentUserId = null;
+
+
+    /*
+     * IMPORTANT TRANSCRIPTION STATE
+     *
+     * finalTranscript:
+     * Contains only confirmed/final Deepgram text.
+     *
+     * interimTranscript:
+     * Contains the current temporary Deepgram result.
+     *
+     * Interim results are REPLACED, not appended.
+     */
+
+    let finalTranscript = "";
+
+    let interimTranscript = "";
+
+
+    /* ==========================================================================
+       DOM REFERENCES
+       ========================================================================== */
+
+    const startButton =
+        document.getElementById("startButton");
+
+    const appendButton =
+        document.getElementById("appendButton");
+
+    const stopButton =
+        document.getElementById("stopButton");
+
+    const saveButton =
+        document.getElementById("saveButton");
+
+    const renameButton =
+        document.getElementById("renameButton");
+
+    const deleteButton =
+        document.getElementById("deleteButton");
+
+    const status =
+        document.getElementById("status");
+
+    const transcript =
+        document.getElementById("transcript");
+
+    const notesList =
+        document.getElementById("notesList");
+
+    const activeNoteBanner =
+        document.getElementById("activeNoteBanner");
+
+    const searchKeyword =
+        document.getElementById("searchKeyword");
+
+    const filterDate =
+        document.getElementById("filterDate");
+
+    const clearFilterBtn =
+        document.getElementById("clearFilterBtn");
+
+    const tracksContainer =
+        document.getElementById("tracksContainer");
+
+
+    const themeToggleBtn =
+        document.getElementById("themeToggleBtn");
+
+    const themeToggleIcon =
+        document.getElementById("themeToggleIcon");
+
+    const themeToggleText =
+        document.getElementById("themeToggleText");
+
+
+    const authOverlay =
+        document.getElementById("authOverlay");
+
+    const authTitle =
+        document.getElementById("authTitle");
+
+    const authSubtitle =
+        document.getElementById("authSubtitle");
+
+    const authSubmitBtn =
+        document.getElementById("authSubmitBtn");
+
+    const authSwitchPrompt =
+        document.getElementById("authSwitchPrompt");
+
+
+    /* ==========================================================================
+       EVENT LISTENERS
+       ========================================================================== */
+
+    window.addEventListener(
+        "DOMContentLoaded",
+        verifySystemSessionToken
+    );
+
+    startButton.addEventListener(
+        "click",
+        () => startRecording(false)
+    );
+
+    appendButton.addEventListener(
+        "click",
+        () => startRecording(true)
+    );
+
+    stopButton.addEventListener(
+        "click",
+        stopRecording
+    );
+
+    saveButton.addEventListener(
+        "click",
+        saveVoiceNote
+    );
+
+    renameButton.addEventListener(
+        "click",
+        renameSelectedNote
+    );
+
+    deleteButton.addEventListener(
+        "click",
+        deleteSelectedNote
+    );
+
+    searchKeyword.addEventListener(
+        "input",
+        debounce(searchNotes, 300)
+    );
+
+    filterDate.addEventListener(
+        "change",
+        filterNotesByDate
+    );
+
+    clearFilterBtn.addEventListener(
+        "click",
+        () => {
+            filterDate.value = "";
+            loadNotesHistory();
+        }
+    );
+
+
+    /* ==========================================================================
+       AUTHENTICATION
+       ========================================================================== */
+
+    function verifySystemSessionToken() {
+
+        const cachedId =
+            localStorage.getItem("voicenox_user_id");
+
+        if (cachedId) {
+
+            currentUserId = cachedId;
+
+            authOverlay.style.display = "none";
+
+            loadNotesHistory();
+
+        } else {
+
+            authOverlay.style.display = "flex";
+        }
+    }
+
+
+    function toggleAuthState(e) {
+
+        if (e) {
+            e.preventDefault();
+        }
+
+        isLoginState = !isLoginState;
+
+        document.getElementById("authUsername").value = "";
+
+        document.getElementById("authPassword").value = "";
+
+        if (isLoginState) {
+
+            authTitle.innerHTML =
+                "🎙️ <span>VOICENOX</span> Login";
+
+            authSubtitle.textContent =
+                "Access your isolated security workspace node.";
+
+            authSubmitBtn.textContent =
+                "Authorize Session";
+
+            authSwitchPrompt.innerHTML =
+                `New node variant?
+                 <a href="#" onclick="toggleAuthState(event)">
+                    Register clean handle
+                 </a>`;
+
+        } else {
+
+            authTitle.innerHTML =
+                "🧬 <span>VOICENOX</span> Register";
+
+            authSubtitle.textContent =
+                "Deploy a new personal user identity vector to local database.";
+
+            authSubmitBtn.textContent =
+                "Provision Identity Account";
+
+            authSwitchPrompt.innerHTML =
+                `Existing handle profile?
+                 <a href="#" onclick="toggleAuthState(event)">
+                    Execute profile login
+                 </a>`;
+        }
+    }
+
+
+    function togglePasswordInputMask() {
+
+        const passwordField =
+            document.getElementById("authPassword");
+
+        const toggleIcon =
+            document.getElementById(
+                "togglePasswordVisibilityBtn"
+            );
+
+        if (passwordField.type === "password") {
+
+            passwordField.type = "text";
+
+            toggleIcon.textContent = "🙈";
+
+        } else {
+
+            passwordField.type = "password";
+
+            toggleIcon.textContent = "👁️";
+        }
+    }
+
+
+    async function handleAuthSubmit(e) {
+
+        if (e) {
+            e.preventDefault();
+        }
+
+        const usernameInput =
+            document.getElementById("authUsername")
+                .value
+                .trim();
+
+        const passwordInput =
+            document.getElementById("authPassword")
+                .value;
+
+        const pathEndpoint =
+            isLoginState
+                ? "/api/auth/login"
+                : "/api/auth/register";
+
+
+        try {
+
+            authSubmitBtn.disabled = true;
+
+            authSubmitBtn.textContent =
+                "Processing Stream Pipeline...";
+
+
+            const payloadData = {
+
+                email: usernameInput,
+
+                fullName:
+                    usernameInput.split("@")[0],
+
+                password: passwordInput
+            };
+
+
+            const res = await fetch(
+                `http://localhost:1999${pathEndpoint}`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(payloadData)
+                }
+            );
+
+
+            if (!res.ok) {
+
+                const messageText =
+                    await res.text();
+
+                throw new Error(
+                    messageText ||
+                    "Pipeline request rejected by server validation properties."
+                );
+            }
+
+
+            const userEntity =
+                await res.json();
+
+
+            if (userEntity && userEntity.id) {
+
+                currentUserId =
+                    userEntity.id;
+
+                localStorage.setItem(
+                    "voicenox_user_id",
+                    userEntity.id
+                );
+
+                authOverlay.style.display =
+                    "none";
+
+                document.getElementById(
+                    "authUsername"
+                ).value = "";
+
+                document.getElementById(
+                    "authPassword"
+                ).value = "";
+
+                loadNotesHistory();
+
+                alert(
+                    isLoginState
+                        ? "Authorization successful!"
+                        : "New workspace identity account created!"
+                );
+
+            } else {
+
+                throw new Error(
+                    "Invalid backend data envelope response payload."
+                );
+            }
+
+        } catch (err) {
+
+            alert(
+                "Security Profile Error: "
+                + err.message
+            );
+
+        } finally {
+
+            authSubmitBtn.disabled = false;
+
+            authSubmitBtn.textContent =
+                isLoginState
+                    ? "Authorize Session"
+                    : "Provision Identity Account";
+        }
+    }
+
+
+    function terminateUserSession() {
+
+        if (
+            !confirm(
+                "Are you sure you want to drop your active session authentication stream?"
+            )
+        ) {
+            return;
+        }
+
+
+        localStorage.removeItem(
+            "voicenox_user_id"
+        );
+
+        currentUserId = null;
+
+        currentNoteId = null;
+
+        finalTranscript = "";
+
+        interimTranscript = "";
+
+        transcript.value = "";
+
+        activeNoteBanner.innerHTML =
+            "⚡ System: Initialized empty scratchpad buffer block.";
+
+        tracksContainer.innerHTML =
+            `<div style="color:var(--text-muted);
+                        font-size:13px;
+                        font-style:italic;">
+                Select a note from history to view voice tracks.
+             </div>`;
+
+
+        appendButton.disabled = true;
+
+        renameButton.disabled = true;
+
+        deleteButton.disabled = true;
+
+        saveButton.disabled = true;
+
+
+        authOverlay.style.display = "flex";
+
+
+        if (!isLoginState) {
+            toggleAuthState();
+        }
+    }
+
+
+    /* ==========================================================================
+       THEME
+       ========================================================================== */
+
+    function applyThemeModePreference(theme) {
+
+        if (theme === "dark") {
+
+            document.documentElement.setAttribute(
+                "data-theme",
+                "dark"
+            );
+
+            themeToggleIcon.textContent = "☀️";
+
+            themeToggleText.textContent =
+                "White Mode";
+
+            localStorage.setItem(
+                "voicenox_theme_mode",
+                "dark"
+            );
+
+        } else {
+
+            document.documentElement.removeAttribute(
+                "data-theme"
+            );
+
+            themeToggleIcon.textContent = "🖤";
+
+            themeToggleText.textContent =
+                "Black Mode";
+
+            localStorage.setItem(
+                "voicenox_theme_mode",
+                "light"
+            );
+        }
+    }
+
+
+    const savedUserThemePreference =
+        localStorage.getItem(
+            "voicenox_theme_mode"
+        );
+
+
+    if (
+        savedUserThemePreference === "dark"
+    ) {
+
+        applyThemeModePreference("dark");
+
+    } else {
+
+        applyThemeModePreference("light");
+    }
+
+
+    if (themeToggleBtn) {
+
+        themeToggleBtn.addEventListener(
+            "click",
+            function () {
+
+                const activeStateMode =
+                    document.documentElement
+                        .getAttribute("data-theme");
+
+                if (
+                    activeStateMode === "dark"
+                ) {
+
+                    applyThemeModePreference(
+                        "light"
+                    );
+
+                } else {
+
+                    applyThemeModePreference(
+                        "dark"
+                    );
+                }
+            }
+        );
+    }
+
+
+    /* ==========================================================================
+       NOTES HISTORY
+       ========================================================================== */
+
+    async function loadNotesHistory() {
+
+        if (!currentUserId) {
+            return;
+        }
+
+
+        try {
+
+            const res = await fetch(
+                `http://localhost:1999/note/sorted?userId=${currentUserId}`
+            );
+
+
+            if (!res.ok) {
+                throw new Error(
+                    "Failed to load notes"
+                );
+            }
+
+
+            const notes =
+                await res.json();
+
+            renderNotesList(notes);
+
+        } catch (err) {
+
+            notesList.innerHTML =
+                `<div style="color:var(--btn-danger);
+                            padding:10px;
+                            font-size:12px;">
+                    Cluster sync failure.
+                 </div>`;
+        }
+    }
+
+
+    function renderNotesList(notes) {
+
+        if (notes.length === 0) {
+
+            notesList.innerHTML =
+                `<div style="text-align:center;
+                            padding:20px;
+                            color:#64748b;
+                            font-size:13px;">
+                    No indexes found.
+                 </div>`;
+
+            return;
+        }
+
+
+        notesList.innerHTML = "";
+
+
+        notes.forEach(note => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                `note-item ${
+                    currentNoteId === note.id
+                        ? "active"
+                        : ""
+                }`;
+
+
+            const dateStr =
+                new Date(
+                    note.createdAt
+                ).toLocaleString(
+                    undefined,
+                    {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            item.innerHTML = `
+                <div class="note-item-title">
+                    📁 ${note.title || "Untitled Note"}
+                </div>
+
+                <div class="note-item-date">
+                    ⏱️ ${dateStr}
+                </div>
+            `;
+
+
+            item.addEventListener(
+                "click",
+                () => selectNoteFromSidebar(note)
+            );
+
+
+            notesList.appendChild(item);
+        });
+    }
+
+
+    function selectNoteFromSidebar(note) {
+
+        currentNoteId = note.id;
+
+        /*
+         * When loading an existing note, its entire
+         * transcript becomes the confirmed transcript.
+         */
+
+        finalTranscript =
+            note.text || "";
+
+        interimTranscript = "";
+
+        transcript.value =
+            finalTranscript;
+
+
+        activeNoteBanner.innerHTML =
+            `📄 Active Matrix:
+             <strong>${note.title}</strong>
+             (ID: ${note.id})`;
+
+
+        appendButton.disabled = false;
+
+        renameButton.disabled = false;
+
+        deleteButton.disabled = false;
+
+        saveButton.disabled = false;
+
+
+        document
+            .querySelectorAll(".note-item")
+            .forEach(
+                el => el.classList.remove("active")
+            );
+
+
+        loadAttachedAudioTracks(note.id);
+    }
+
+
+    /* ==========================================================================
+       RECORDINGS
+       ========================================================================== */
+
+    async function loadAttachedAudioTracks(noteId) {
+
+        tracksContainer.innerHTML =
+            `<div style="color:var(--text-muted);
+                        font-size:13px;">
+                Loading audio tracks...
+             </div>`;
+
+
+        try {
+
+            const res = await fetch(
+                `http://localhost:1999/recording/note/${noteId}`
+            );
+
+
+            if (!res.ok) {
+                throw new Error(
+                    "Failed to pull recording links."
+                );
+            }
+
+
+            const tracks =
+                await res.json();
+
+
+            if (tracks.length === 0) {
+
+                tracksContainer.innerHTML =
+                    `<div style="color:var(--text-muted);
+                                font-size:13px;
+                                font-style:italic;">
+                        No recorded audio chunks found for this note block.
+                     </div>`;
+
+                return;
+            }
+
+
+            tracksContainer.innerHTML = "";
+
+
+            tracks.forEach(
+                (track, index) => {
+
+                    const row =
+                        document.createElement("div");
+
+                    row.className =
+                        "track-row";
+
+
+                    const timeStr =
+                        new Date(
+                            track.createdAt
+                        ).toLocaleString(
+                            undefined,
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit"
+                            }
+                        );
+
+
+                    const audioUrlPath =
+                        `http://localhost:1999/uploads/recordings/${track.audioUrl}`;
+
+
+                    row.innerHTML = `
+                        <div class="track-info">
+                            🎙️ Track #${index + 1}
+
+                            <span
+                                style="color:var(--text-muted);
+                                       font-size:11px;">
+                                (${timeStr})
+                            </span>
+                        </div>
+
+                        <audio
+                            controls
+                            src="${audioUrlPath}">
+                        </audio>
+                    `;
+
+
+                    tracksContainer.appendChild(row);
+                }
+            );
+
+        } catch (err) {
+
+            tracksContainer.innerHTML =
+                `<div style="color:var(--btn-danger);
+                            font-size:13px;">
+                    Failed to fetch audio stream layout.
+                 </div>`;
+        }
+    }
+
+
+    /* ==========================================================================
+       RENAME
+       ========================================================================== */
+
+    async function renameSelectedNote() {
+
+        if (!currentNoteId) {
+            return;
+        }
+
+
+        const newTitle =
+            prompt(
+                "Provide new matrix descriptor title:"
+            );
+
+
+        if (
+            !newTitle ||
+            !newTitle.trim()
+        ) {
+            return;
+        }
+
+
+        try {
+
+            status.textContent =
+                "Status: Mutating descriptor...";
+
+
+            const res = await fetch(
+                `http://localhost:1999/note/rename/${currentNoteId}?title=${encodeURIComponent(newTitle.trim())}`,
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+            if (!res.ok) {
+                throw new Error(
+                    "Mutation rejected."
+                );
+            }
+
+
+            const updated =
+                await res.json();
+
+
+            activeNoteBanner.innerHTML =
+                `📄 Active Matrix:
+                 <strong>${updated.title}</strong>
+                 (ID: ${updated.id})`;
+
+
+            loadNotesHistory();
+
+        } catch (err) {
+
+            alert(
+                "Mutation Error: "
+                + err.message
+            );
+
+        } finally {
+
+            status.textContent =
+                "Status: Idle";
+        }
+    }
+
+
+    /* ==========================================================================
+       START RECORDING
+       ========================================================================== */
+
+    async function startRecording(isAppendMode) {
+
+        if (!currentUserId) {
+
+            alert(
+                "Session Context missing. Please authorize identity user node."
+            );
+
+            return;
+        }
+
+
+        audioChunks = [];
+
+
+        let targetNoteId =
+            currentNoteId;
+
+
+        /*
+         * NEW NOTE
+         *
+         * Start with an empty confirmed transcript.
+         */
+
+        if (
+            !isAppendMode ||
+            !targetNoteId
+        ) {
+
+            finalTranscript = "";
+
+            interimTranscript = "";
+
+
+            try {
+
+                status.textContent =
+                    "Status: Provisioning database tracking slot...";
+
+
+                const options = {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                };
+
+
+                const autoTitle =
+                    "Voice Note - "
+                    + new Date()
+                        .toLocaleString(
+                            "en-US",
+                            options
+                        );
+
+
+                const noteResponse =
+                    await fetch(
+                        `http://localhost:1999/note/${currentUserId}`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    title: autoTitle,
+                                    text: ""
+                                })
+                        }
+                    );
+
+
+                if (!noteResponse.ok) {
+                    throw new Error(
+                        "Pre-initialization build failed."
+                    );
+                }
+
+
+                const savedNote =
+                    await noteResponse.json();
+
+
+                targetNoteId =
+                    savedNote.id;
+
+                currentNoteId =
+                    savedNote.id;
+
+
+                activeNoteBanner.innerHTML =
+                    `📄 Active Matrix:
+                     <strong>${savedNote.title}</strong>
+                     (ID: ${savedNote.id})`;
+
+
+                transcript.value = "";
+
+            } catch (creationErr) {
+
+                console.error(
+                    "Auto provisioning failed:",
+                    creationErr
+                );
+
+                status.textContent =
+                    "Status: Database Provisioning Failed";
+
+                return;
+            }
+
+
+        } else {
+
+            /*
+             * APPEND MODE
+             *
+             * Preserve the existing note transcript.
+             */
+
+            finalTranscript =
+                transcript.value.trim();
+
+            interimTranscript = "";
+
+
+            status.textContent =
+                "Status: Appending segment...";
+
+
+            transcript.value =
+                finalTranscript
+                + (finalTranscript ? " " : "");
+        }
+
+
+        /* ==========================================================================
+           MICROPHONE
+           ========================================================================== */
+
+        try {
+
+            status.textContent =
+                "Status: Initializing Mic...";
+
+
+            microphoneStream =
+                await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        channelCount: 1,
+                        noiseSuppression: true,
+                        echoCancellation: true,
+                        autoGainControl: true
+                    }
+                });
+
+
+            /* ==========================================================================
+               FRONTEND WEBSOCKET
+               ========================================================================== */
+
+            status.textContent =
+                "Status: Connecting to Live AI Streaming Engine...";
+
+
+            socket =
+                new WebSocket(
+                    `ws://localhost:1999/ws/voice?noteId=${targetNoteId}`
+                );
+
+
+            socket.binaryType =
+                "arraybuffer";
+
+
+            socket.onopen = function () {
+
+                status.textContent =
+                    "Status: Live Recording Connected";
+
+                status.className =
+                    "recording-active";
+
+
+                const mimeType =
+                    "audio/webm;codecs=opus";
+
+
+                mediaRecorder =
+                    new MediaRecorder(
+                        microphoneStream,
+                        {
+                            mimeType: mimeType
+                        }
+                    );
+
+
+                mediaRecorder.ondataavailable =
+                    function(event) {
+
+                        if (
+                            event.data.size > 0
+                        ) {
+
+                            audioChunks.push(
+                                event.data
+                            );
+
+
+                            if (
+                                socket &&
+                                socket.readyState ===
+                                WebSocket.OPEN
+                            ) {
+
+                                socket.send(
+                                    event.data
+                                );
+                            }
+                        }
+                    };
+
+
+                mediaRecorder.start(250);
+
+
+                startButton.disabled = true;
+
+                appendButton.disabled = true;
+
+                renameButton.disabled = true;
+
+                deleteButton.disabled = true;
+
+                stopButton.disabled = false;
+
+                saveButton.disabled = true;
+            };
+
+
+            /* ==========================================================================
+               FIXED TRANSCRIPTION HANDLER
+               ========================================================================== */
+
+            socket.onmessage =
+                function(event) {
+
+                    try {
+
+                        /*
+                         * DeepgramService sends normalized JSON:
+                         *
+                         * {
+                         *   type: "transcript",
+                         *   text: "...",
+                         *   isFinal: true/false,
+                         *   speechFinal: true/false
+                         * }
+                         */
+
+
+                        const data =
+                            JSON.parse(event.data);
+
+
+                        if (
+                            data.type !== "transcript"
+                        ) {
+                            return;
+                        }
+
+
+                        const text =
+                            data.text
+                                ? data.text.trim()
+                                : "";
+
+
+                        if (!text) {
+                            return;
+                        }
+
+
+                        /* ==============================================================
+                           FINAL RESULT
+                           ============================================================== */
+
+                        if (data.isFinal) {
+
+                            /*
+                             * Add the confirmed Deepgram result
+                             * permanently.
+                             */
+
+                            finalTranscript =
+                                finalTranscript
+                                + (
+                                    finalTranscript
+                                        ? " "
+                                        : ""
+                                )
+                                + text;
+
+
+                            /*
+                             * The interim version has now
+                             * become final.
+                             */
+
+                            interimTranscript = "";
+
+
+                        } else {
+
+                            /*
+                             * IMPORTANT:
+                             *
+                             * DO NOT APPEND interim results.
+                             *
+                             * Replace the previous interim
+                             * result with the newest one.
+                             */
+
+                            interimTranscript =
+                                text;
+                        }
+
+
+                        /*
+                         * Display:
+                         *
+                         * FINAL TEXT
+                         * +
+                         * CURRENT INTERIM TEXT
+                         */
+
+                        transcript.value =
+                            finalTranscript
+                            + (
+                                interimTranscript
+                                    ? " "
+                                    + interimTranscript
+                                    : ""
+                            );
+
+
+                        transcript.scrollTop =
+                            transcript.scrollHeight;
+
+
+                    } catch (e) {
+
+                        console.error(
+                            "Transcription pipeline chunk error:",
+                            e
+                        );
+                    }
+                };
+
+
+            socket.onerror =
+                () => {
+
+                    status.textContent =
+                        "Status: Connect Error";
+
+                    status.className = "";
+                };
+
+
+            socket.onclose =
+                () => {
+
+                    console.log(
+                        "WebSocket Dropped"
+                    );
+                };
+
+
+        } catch (error) {
+
+            console.error(
+                "Microphone initialization error:",
+                error
+            );
+
+            status.textContent =
+                "Status: Hardware Denied";
+
+            status.className = "";
+
+            cleanupAudioTracks();
+        }
+    }
+
+
+    /* ==========================================================================
+       STOP RECORDING
+       ========================================================================== */
+
+    function stopRecording() {
+
+        status.textContent =
+            "Status: Finalizing matrix...";
+
+        status.className = "";
+
+
+        if (
+            mediaRecorder &&
+            mediaRecorder.state !== "inactive"
+        ) {
+
+            mediaRecorder.stop();
+        }
+
+
+        cleanupAudioTracks();
+
+
+        if (
+            socket &&
+            socket.readyState ===
+            WebSocket.OPEN
+        ) {
+
+            socket.close();
+        }
+
+
+        mediaRecorder = null;
+
+        socket = null;
+
+
+        /*
+         * The current interim transcript should not
+         * become a permanently saved duplicate.
+         *
+         * The finalTranscript is the authoritative text.
+         */
+
+        transcript.value =
+            finalTranscript;
+
+
+        startButton.disabled = false;
+
+        appendButton.disabled =
+            (currentNoteId === null);
+
+        renameButton.disabled =
+            (currentNoteId === null);
+
+        deleteButton.disabled =
+            (currentNoteId === null);
+
+        stopButton.disabled = true;
+
+        saveButton.disabled = false;
+
+
+        status.textContent =
+            "Status: Paused. Review workspace matrix.";
+    }
+
+
+    /* ==========================================================================
+       SAVE NOTE
+       ========================================================================== */
+
+    async function saveVoiceNote() {
+
+        if (!currentUserId) {
+            return;
+        }
+
+
+        status.textContent =
+            "Status: Committing cluster stream...";
+
+
+        saveButton.disabled = true;
+
+
+        try {
+
+            let targetNoteId =
+                currentNoteId;
+
+
+            /*
+             * Use finalTranscript as the authoritative
+             * transcript.
+             */
+
+            const finalText =
+                finalTranscript.trim();
+
+
+            const options = {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            };
+
+
+            const autoTitle =
+                "Voice Note - "
+                + new Date()
+                    .toLocaleString(
+                        "en-US",
+                        options
+                    );
+
+
+            /* ==============================================================
+               CREATE NOTE IF NECESSARY
+               ============================================================== */
+
+            if (targetNoteId === null) {
+
+                const noteResponse =
+                    await fetch(
+                        `http://localhost:1999/note/${currentUserId}`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    title: autoTitle,
+                                    text: finalText
+                                })
+                        }
+                    );
+
+
+                if (!noteResponse.ok) {
+                    throw new Error(
+                        "Note build failed."
+                    );
+                }
+
+
+                const savedNote =
+                    await noteResponse.json();
+
+
+                targetNoteId =
+                    savedNote.id;
+
+                currentNoteId =
+                    savedNote.id;
+
+
+            } else {
+  
+                /* ==============================================================
+                   UPDATE EXISTING NOTE
+                   ============================================================== */
+
+                const updateResponse =
+                    await fetch(
+                        `http://localhost:1999/note/update/${targetNoteId}`,
+                        {
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    text: finalText
+                                })
+                        }
+                    );
+
+
+                if (!updateResponse.ok) {
+                    throw new Error(
+                        "Append patch failed."
+                    );
+                }
+            }
+
+
+            /* ==============================================================
+               SAVE AUDIO
+               ============================================================== */
+
+            if (audioChunks.length > 0) {
+
+                const audioBlob =
+                    new Blob(
+                        audioChunks,
+                        {
+                            type:
+                                "audio/webm;codecs=opus"
+                        }
+                    );
+
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "audio",
+                    audioBlob,
+                    `recording_${Date.now()}.webm`
+                );
+
+
+                formData.append(
+                    "transcription",
+                    finalText
+                );
+
+
+                const recordingResponse =
+                    await fetch(
+                        `http://localhost:1999/recording/${targetNoteId}`,
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                if (!recordingResponse.ok) {
+                    throw new Error(
+                        "Audio link failed."
+                    );
+                }
+            }
+
+
+            alert(
+                "Data block successfully committed!"
+            );
+
+
+            /* ==============================================================
+               RESET WORKSPACE
+               ============================================================== */
+
+            currentNoteId = null;
+
+            finalTranscript = "";
+
+            interimTranscript = "";
+
+            transcript.value = "";
+
+
+            activeNoteBanner.innerHTML =
+                "⚡ System: Initialized empty scratchpad buffer block.";
+
+
+            tracksContainer.innerHTML =
+                `<div style="color:var(--text-muted);
+                            font-size:13px;
+                            font-style:italic;">
+                    Select a note from history to view voice tracks.
+                 </div>`;
+
+
+            appendButton.disabled = true;
+
+            renameButton.disabled = true;
+
+            deleteButton.disabled = true;
+
+            saveButton.disabled = true;
+
+
+            loadNotesHistory();
+
+
+        } catch (error) {
+
+            saveButton.disabled = false;
+
+            alert(
+                "Commit Error: "
+                + error.message
+            );
+
+        } finally {
+
+            status.textContent =
+                "Status: Idle";
+        }
+    }
+
+
+    /* ==========================================================================
+       SEARCH
+       ========================================================================== */
+
+    async function searchNotes() {
+
+        if (!currentUserId) {
+            return;
+        }
+
+
+        const query =
+            searchKeyword.value.trim();
+
+
+        if (!query) {
+
+            loadNotesHistory();
+
+            return;
+        }
+
+
+        try {
+
+            const res =
+                await fetch(
+                    `http://localhost:1999/note/search?keyword=${encodeURIComponent(query)}&userId=${currentUserId}`
+                );
+
+
+            if (res.ok) {
+
+                const notes =
+                    await res.json();
+
+                renderNotesList(notes);
+            }
+
+        } catch (err) {
+
+            console.error(
+                "Search err:",
+                err
+            );
+        }
+    }
+
+
+    /* ==========================================================================
+       DATE FILTER
+       ========================================================================== */
+
+    async function filterNotesByDate() {
+
+        if (!currentUserId) {
+            return;
+        }
+
+
+        const dateVal =
+            filterDate.value;
+
+
+        if (!dateVal) {
+
+            loadNotesHistory();
+
+            return;
+        }
+
+
+        try {
+
+            const startIso =
+                dateVal + "T00:00:00";
+
+            const endIso =
+                dateVal + "T23:59:59";
+
+
+            const res =
+                await fetch(
+                    `http://localhost:1999/note/filter/date?startIso=${encodeURIComponent(startIso)}&endIso=${encodeURIComponent(endIso)}&userId=${currentUserId}`
+                );
+
+
+            if (res.ok) {
+
+                const notes =
+                    await res.json();
+
+                renderNotesList(notes);
+            }
+
+        } catch (err) {
+
+            console.error(
+                "Date filter err:",
+                err
+            );
+        }
+    }
+
+
+    /* ==========================================================================
+       DELETE NOTE
+       ========================================================================== */
+
+    async function deleteSelectedNote() {
+
+        if (!currentNoteId) {
+            return;
+        }
+
+
+        if (
+            !confirm(
+                "Are you sure you want to permanently delete this note and its audio records?"
+            )
+        ) {
+            return;
+        }
+
+
+        try {
+
+            status.textContent =
+                "Status: Removing block...";
+
+
+            const res =
+                await fetch(
+                    `http://localhost:1999/note/${currentNoteId}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            if (!res.ok) {
+
+                throw new Error(
+                    "Deletion rejected by database configuration constraints."
+                );
+            }
+
+
+            currentNoteId = null;
+
+            finalTranscript = "";
+
+            interimTranscript = "";
+
+            transcript.value = "";
+
+
+            activeNoteBanner.innerHTML =
+                "⚡ System: Initialized empty scratchpad buffer block.";
+
+
+            tracksContainer.innerHTML =
+                `<div style="color:var(--text-muted);
+                            font-size:13px;
+                            font-style:italic;">
+                    Select a note from history to view voice tracks.
+                 </div>`;
+
+
+            appendButton.disabled = true;
+
+            renameButton.disabled = true;
+
+            deleteButton.disabled = true;
+
+            saveButton.disabled = true;
+
+
+            loadNotesHistory();
+
+
+            alert(
+                "Note successfully expunged from local directory."
+            );
+
+
+        } catch (err) {
+
+            console.error(
+                "Purging Context Failure:",
+                err
+            );
+
+
+            alert(
+                "Deletion Error: "
+                + err.message
+            );
+
+        } finally {
+
+            status.textContent =
+                "Status: Idle";
+        }
+    }
+
+
+    /* ==========================================================================
+       MICROPHONE CLEANUP
+       ========================================================================== */
+
+    function cleanupAudioTracks() {
+
+        if (microphoneStream) {
+
+            microphoneStream
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
+            microphoneStream = null;
+        }
+    }
+
+
+    /* ==========================================================================
+       DEBOUNCE
+       ========================================================================== */
+
+    function debounce(func, delay) {
+
+        let timeout;
+
+
+        return function(...args) {
+
+            clearTimeout(timeout);
+
+
+            timeout =
+                setTimeout(
+                    () => func.apply(this, args),
+                    delay
+                );
+        };
+    }
+
+</script>
+
+</body>
+</html>

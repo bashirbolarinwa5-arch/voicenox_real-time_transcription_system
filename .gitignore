@@ -1,0 +1,18 @@
+# Target build directories
+/target/
+build/
+
+# IDE Configuration folders
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# System OS metadata files
+.DS_Store
+Thumbs.db
+
+# Local database or upload storage test dumps
+voicenox_uploads/
+*.log
