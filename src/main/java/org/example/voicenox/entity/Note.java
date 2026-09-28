@@ -28,4 +28,5 @@ public class Note {
         @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
         @JsonManagedReference // <-- ADD THIS ANNOTATION HERE TO MANAGE RELATION RELATIONSHIPS CLEANLY
         private List<Recording> recordings;
+
 }

@@ -14,6 +14,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     public WebSocketConfig(VoiceWebSocketHandler voiceWebSocketHandler) {
         this.voiceWebSocketHandler = voiceWebSocketHandler;
+
     }
 
     @Override
@@ -22,4 +23,5 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(voiceWebSocketHandler, "/ws/voice")
                 .setAllowedOrigins("*");
     }
+
 }

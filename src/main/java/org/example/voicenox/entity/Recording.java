@@ -23,4 +23,6 @@ public class Recording {
     @JoinColumn(name = "note_id")
     @JsonBackReference // <-- ADD THIS ANNOTATION HERE TO BREAK INFINITE SERIALIZATION LOOPS
     private Note note;
+
+
 }

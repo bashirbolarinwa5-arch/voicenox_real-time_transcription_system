@@ -1,15 +1,14 @@
 package org.example.voicenox.controller;
 
 import org.example.voicenox.entity.User;
+import org.example.voicenox.security.AuthResponse;
+import org.example.voicenox.security.JwtService;
 import org.example.voicenox.service.UserService;
 
-import org.springframework.http.HttpStatus;
-
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,60 +18,85 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    private final JwtService jwtService;
+
+
+    public UserController(
+            UserService userService,
+            JwtService jwtService
+    ) {
+
+        this.userService =
+                userService;
+
+        this.jwtService =
+                jwtService;
     }
 
-    // 🔐 REGISTER ENDPOINT
+
+    // ==========================================
+    // REGISTER
+    // ==========================================
+
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody org.example.voicenox.entity.User user) {
-        try {
-            if (user.getEmail() == null || user.getPassword() == null) {
-                return ResponseEntity.badRequest().body("Email handles and passwords are required.");
-            }
-            org.example.voicenox.entity.User savedUser = userService.createUser(user);
-            return ResponseEntity.ok(savedUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed: " + e.getMessage());
-        }
+    public ResponseEntity<AuthResponse> register(
+            @RequestBody User user
+    ) {
+
+        User createdUser =
+                userService.createUser(
+                        user
+                );
+
+
+        String token =
+                jwtService.generateToken(
+                        createdUser.getId(),
+                        createdUser.getEmail()
+                );
+
+
+        return ResponseEntity.ok(
+
+                AuthResponse.from(
+                        token,
+                        createdUser
+                )
+
+        );
     }
 
-    // 🔑 LOGIN ENDPOINT
+
+    // ==========================================
+    // LOGIN
+    // ==========================================
+
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginParams) {
-        String email = loginParams.get("email");
-        String password = loginParams.get("password");
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody User user
+    ) {
 
-        if (email == null || password == null) {
-            return ResponseEntity.badRequest().body("Email handle and password strings are required.");
-        }
+        User authenticatedUser =
+                userService.login(
+                        user.getEmail(),
+                        user.getPassword()
+                );
 
-        org.example.voicenox.entity.User authenticatedUser = userService.login(email, password);
-        if (authenticatedUser != null) {
-            return ResponseEntity.ok(authenticatedUser);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid workspace credentials profile handles.");
-        }
-    }
 
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
+        String token =
+                jwtService.generateToken(
+                        authenticatedUser.getId(),
+                        authenticatedUser.getEmail()
+                );
 
-    @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
-    }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully.");
-    }
+        return ResponseEntity.ok(
 
-    @PutMapping("/users/update/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+                AuthResponse.from(
+                        token,
+                        authenticatedUser
+                )
+
+        );
     }
 }

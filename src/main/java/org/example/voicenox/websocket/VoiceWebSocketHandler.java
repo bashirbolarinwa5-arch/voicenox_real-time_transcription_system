@@ -42,6 +42,7 @@ public class VoiceWebSocketHandler extends BinaryWebSocketHandler {
                 session,
                 message.getPayload()
         );
+
     }
 
     @Override
@@ -53,6 +54,7 @@ public class VoiceWebSocketHandler extends BinaryWebSocketHandler {
                 "Received text message: "
                         + message.getPayload()
         );
+
     }
 
     @Override
@@ -66,6 +68,7 @@ public class VoiceWebSocketHandler extends BinaryWebSocketHandler {
         );
 
         deepgramService.close(session);
+
     }
 
     @Override
@@ -79,5 +82,7 @@ public class VoiceWebSocketHandler extends BinaryWebSocketHandler {
         );
 
         deepgramService.close(session);
+
     }
+
 }
