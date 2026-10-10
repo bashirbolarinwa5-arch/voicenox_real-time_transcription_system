@@ -7,6 +7,7 @@ function Login({ onLogin, onRegister }) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -94,17 +95,23 @@ function Login({ onLogin, onRegister }) {
                             Password
                         </label>
 
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(event) =>
-                                setPassword(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="••••••••"
-                            required
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword((previous) => !previous)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? "🙈" : "👁"}
+                            </button>
+                        </div>
 
                     </div>
 

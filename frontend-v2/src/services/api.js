@@ -3,6 +3,7 @@ import { apiFetch } from "./http";
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:1999";
 
+
 /*
 |--------------------------------------------------------------------------
 | NOTES
@@ -64,6 +65,12 @@ export async function deleteNote(noteId) {
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| RENAME NOTE
+|--------------------------------------------------------------------------
+*/
+
 export async function renameNote(
     noteId,
     title
@@ -82,6 +89,12 @@ export async function renameNote(
     return response.json();
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| UPDATE NOTE TEXT
+|--------------------------------------------------------------------------
+*/
 
 export async function updateNote(
     noteId,
@@ -109,6 +122,12 @@ export async function updateNote(
     return response.json();
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| SEARCH NOTES
+|--------------------------------------------------------------------------
+*/
 
 export async function searchNotes(
     keyword,

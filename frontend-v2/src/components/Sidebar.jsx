@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { getAudioUrl } from "../services/api";
 
 function Sidebar({
@@ -21,11 +21,22 @@ function Sidebar({
         setPlayingId(recordingId);
     }
 
+    function handlePause(recordingId) {
+        setPlayingId((currentId) => {
+            if (currentId === recordingId) {
+                return null;
+            }
+
+            return currentId;
+        });
+    }
+
     return (
         <aside className="sidebar">
 
             {/* BRAND */}
             <div className="sidebar-brand">
+
                 <div className="brand-mark">
                     <span></span>
                 </div>
@@ -34,14 +45,19 @@ function Sidebar({
                     <h2>VoiceNox</h2>
                     <span>Voice workspace</span>
                 </div>
+
             </div>
+
 
             {/* NOTES HEADER */}
             <div className="sidebar-header">
 
                 <div>
                     <h3>My Notes</h3>
-                    <span>{notes.length} notes</span>
+
+                    <span>
+                        {notes.length} notes
+                    </span>
                 </div>
 
                 <button
@@ -54,6 +70,7 @@ function Sidebar({
 
             </div>
 
+
             {/* SEARCH */}
             <div className="search-box">
 
@@ -63,10 +80,13 @@ function Sidebar({
                     type="text"
                     placeholder="Search notes..."
                     value={searchValue}
-                    onChange={(e) => onSearchChange(e.target.value)}
+                    onChange={(e) =>
+                        onSearchChange(e.target.value)
+                    }
                 />
 
             </div>
+
 
             {/* NOTES */}
             <div className="notes-list">
@@ -98,7 +118,9 @@ function Sidebar({
                                     ? "active"
                                     : ""
                             }`}
-                            onClick={() => onSelectNote(note)}
+                            onClick={() =>
+                                onSelectNote(note)
+                            }
                         >
 
                             <div className="note-icon">
@@ -108,16 +130,21 @@ function Sidebar({
                             <div className="note-information">
 
                                 <strong>
-                                    {note.title || "Untitled Note"}
+                                    {note.title ||
+                                        "Untitled Note"}
                                 </strong>
 
                                 <span>
                                     {note.text
-                                        ? note.text.substring(0, 55)
+                                        ? note.text.substring(
+                                            0,
+                                            55
+                                        )
                                         : "No transcription yet"}
                                 </span>
 
                             </div>
+
 
                             <div className="note-actions">
 
@@ -130,6 +157,7 @@ function Sidebar({
                                 >
                                     ✎
                                 </button>
+
 
                                 <button
                                     onClick={(e) => {
@@ -158,7 +186,9 @@ function Sidebar({
                 <button
                     className="audio-history-header"
                     onClick={() =>
-                        setShowAudioHistory(!showAudioHistory)
+                        setShowAudioHistory(
+                            (previous) => !previous
+                        )
                     }
                 >
 
@@ -169,19 +199,28 @@ function Sidebar({
                         </span>
 
                         <div>
-                            <strong>Audio History</strong>
+
+                            <strong>
+                                Audio History
+                            </strong>
 
                             <span>
                                 {recordings.length} recording
-                                {recordings.length !== 1 ? "s" : ""}
+                                {recordings.length !== 1
+                                    ? "s"
+                                    : ""}
                             </span>
+
                         </div>
 
                     </div>
 
+
                     <span
                         className={`audio-history-chevron ${
-                            showAudioHistory ? "open" : ""
+                            showAudioHistory
+                                ? "open"
+                                : ""
                         }`}
                     >
                         ˅
@@ -197,17 +236,24 @@ function Sidebar({
                         {!selectedNote ? (
 
                             <div className="audio-history-empty">
-                                <span>Select a note</span>
+
+                                <span>
+                                    Select a note
+                                </span>
+
                                 <small>
                                     Recordings will appear here
                                 </small>
+
                             </div>
 
                         ) : recordings.length === 0 ? (
 
                             <div className="audio-history-empty">
 
-                                <span>No recordings yet</span>
+                                <span>
+                                    No recordings yet
+                                </span>
 
                                 <small>
                                     Start speaking to create one
@@ -217,18 +263,23 @@ function Sidebar({
 
                         ) : (
 
-                            recordings.map((recording, index) => (
+                            recordings.map(
+                                (recording, index) => (
 
-                                <SidebarRecording
-                                    key={recording.id}
-                                    recording={recording}
-                                    index={index}
-                                    playingId={playingId}
-                                    onPlay={handlePlay}
-                                    onDelete={onDeleteRecording}
-                                />
+                                    <SidebarRecording
+                                        key={recording.id}
+                                        recording={recording}
+                                        index={index}
+                                        playingId={playingId}
+                                        onPlay={handlePlay}
+                                        onPause={handlePause}
+                                        onDelete={
+                                            onDeleteRecording
+                                        }
+                                    />
 
-                            ))
+                                )
+                            )
 
                         )}
 
@@ -244,59 +295,121 @@ function Sidebar({
 
 
 /*
- * Small recording item used inside the sidebar.
+ * Recording item inside Audio History
  */
 function SidebarRecording({
                               recording,
                               index,
                               playingId,
                               onPlay,
+                              onPause,
                               onDelete
                           }) {
 
-    const audioUrl = getAudioUrl(recording.audioUrl);
+    const audioUrl = getAudioUrl(
+        recording.audioUrl
+    );
 
-    const [audio, setAudio] = useState(null);
+    const audioRef = useRef(null);
 
     function toggleAudio(event) {
 
         event.stopPropagation();
+
+        const audio = audioRef.current;
 
         if (!audio) {
             return;
         }
 
         if (audio.paused) {
-            audio.play();
-            onPlay(recording.id);
+
+            /*
+             * Start the actual audio.
+             *
+             * The onPlay event below will update
+             * the React state.
+             */
+            audio.play().catch((error) => {
+
+                console.error(
+                    "Could not play recording:",
+                    error
+                );
+
+                onPause(recording.id);
+
+            });
+
         } else {
+
+            /*
+             * Pause the actual audio.
+             *
+             * The onPause event below will update
+             * the React state.
+             */
             audio.pause();
         }
     }
 
-    function handleEnded() {
-        onPlay(null);
+
+    function handlePlay() {
+        onPlay(recording.id);
     }
+
+
+    function handlePause() {
+        onPause(recording.id);
+    }
+
+
+    function handleEnded() {
+
+        onPause(recording.id);
+
+    }
+
 
     return (
         <div className="sidebar-recording">
 
             <audio
-                ref={setAudio}
+                ref={audioRef}
                 src={audioUrl}
-                onEnded={handleEnded}
                 preload="metadata"
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onEnded={handleEnded}
             />
+
 
             <button
                 className={`sidebar-recording-play ${
-                    playingId === recording.id ? "playing" : ""
+                    playingId === recording.id
+                        ? "playing"
+                        : ""
                 }`}
                 onClick={toggleAudio}
-                title="Play recording"
+                type="button"
+                title={
+                    playingId === recording.id
+                        ? "Pause recording"
+                        : "Play recording"
+                }
+                aria-label={
+                    playingId === recording.id
+                        ? "Pause recording"
+                        : "Play recording"
+                }
             >
-                {playingId === recording.id ? "❚❚" : "▶"}
+
+                {playingId === recording.id
+                    ? "❚❚"
+                    : "▶"}
+
             </button>
+
 
             <div className="sidebar-recording-info">
 
@@ -306,19 +419,27 @@ function SidebarRecording({
 
                 <span>
                     {recording.transcription
-                        ? recording.transcription.substring(0, 42)
+                        ? recording.transcription.substring(
+                            0,
+                            42
+                        )
                         : "No transcription"}
                 </span>
 
             </div>
 
+
             <button
                 className="sidebar-recording-delete"
                 onClick={(event) => {
+
                     event.stopPropagation();
+
                     onDelete(recording.id);
+
                 }}
                 title="Delete recording"
+                type="button"
             >
                 ×
             </button>
@@ -326,5 +447,6 @@ function SidebarRecording({
         </div>
     );
 }
+
 
 export default Sidebar;
