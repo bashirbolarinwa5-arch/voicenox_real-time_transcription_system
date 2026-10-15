@@ -52,7 +52,8 @@ public class WebConfig {
 
 
                 .cors(
-                        cors -> {}
+                        cors -> {
+                        }
                 )
 
 
@@ -128,64 +129,41 @@ public class WebConfig {
         return http.build();
     }
 
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-
-        return new BCryptPasswordEncoder();
-    }
-
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
                         "http://localhost:5174",
                         "http://localhost:4173",
-                        "https://voicenox-real-time-transcription-system-5.onrender.com"
-
-
+                        "https://voicenox-frontend.onrender.com" // Update to your exact frontend domain
                 )
         );
-
 
         configuration.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "PATCH",
-                        "DELETE",
-                        "OPTIONS"
-                )
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         );
-
 
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
-
+        // Change this to true so authentication tokens can pass cross-origin securely
         configuration.setAllowCredentials(
-                false
+                true
         );
-
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
-
 
         source.registerCorsConfiguration(
                 "/**",
                 configuration
         );
-
 
         return source;
     }
