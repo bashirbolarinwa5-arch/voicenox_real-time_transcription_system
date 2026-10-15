@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/uploads") // Aligned directly with the voice.html network mapping paths
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "@CrossOrigin(origins = \"https://voicenox-frontend.onrender.com\", allowCredentials = \"true\")\n")
 public class FileController {
 
     @GetMapping("/recordings/{filename}")

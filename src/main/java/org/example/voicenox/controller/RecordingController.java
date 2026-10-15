@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/recording")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "@CrossOrigin(origins = \"https://voicenox-frontend.onrender.com\", allowCredentials = \"true\")\n")
 public class RecordingController {
 
     private final RecordingService recordingService;

@@ -38,96 +38,27 @@ public class WebConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
-
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
 
-                .csrf(
-                        csrf ->
-                                csrf.disable()
+                // UPDATE THIS LINE to explicitly use your configuration bean:
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-
-                .cors(
-                        cors -> {
-                        }
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/ws/voice/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-
-                .sessionManagement(
-                        session ->
-
-                                session.sessionCreationPolicy(
-
-                                        SessionCreationPolicy
-                                                .STATELESS
-
-                                )
-                )
-
-
-                .authorizeHttpRequests(
-
-                        auth -> auth
-
-                                /*
-                                 * Login/register
-                                 */
-
-                                .requestMatchers(
-                                        "/api/auth/**"
-                                )
-                                .permitAll()
-
-
-                                /*
-                                 * Audio files
-                                 */
-
-                                .requestMatchers(
-                                        "/uploads/**"
-                                )
-                                .permitAll()
-
-
-                                /*
-                                 * Temporarily leave
-                                 * WebSocket open.
-                                 *
-                                 * We will secure this after
-                                 * REST JWT works.
-                                 */
-
-                                .requestMatchers(
-                                        "/ws/voice/**"
-                                )
-                                .permitAll()
-
-
-                                /*
-                                 * Everything else
-                                 * requires JWT.
-                                 */
-
-                                .anyRequest()
-                                .authenticated()
-                )
-
-
-                .addFilterBefore(
-
-                        jwtAuthenticationFilter,
-
-                        UsernamePasswordAuthenticationFilter.class
-
-                );
-
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

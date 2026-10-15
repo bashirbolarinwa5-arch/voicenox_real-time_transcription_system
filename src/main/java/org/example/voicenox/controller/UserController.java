@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "@CrossOrigin(origins = \"https://voicenox-frontend.onrender.com\", allowCredentials = \"true\")\n")
 public class UserController {
 
 

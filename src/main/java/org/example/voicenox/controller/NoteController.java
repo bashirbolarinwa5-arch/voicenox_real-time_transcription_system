@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/note")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "@CrossOrigin(origins = \"https://voicenox-frontend.onrender.com\", allowCredentials = \"true\")\n")
 public class NoteController {
 
     private final NoteService noteService;
