@@ -131,16 +131,14 @@ public class WebConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
                         "http://localhost:5174",
                         "http://localhost:4173",
-                        "https://voicenox-frontend.onrender.com" // Update to your exact frontend domain
+                        "https://voicenox-frontend.onrender.com" // Ensure this matches your exact frontend URL
                 )
         );
 
@@ -152,19 +150,11 @@ public class WebConfig {
                 List.of("*")
         );
 
-        // Change this to true so authentication tokens can pass cross-origin securely
-        configuration.setAllowCredentials(
-                true
-        );
+        // CHANGE THIS FROM FALSE TO TRUE:
+        configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }
