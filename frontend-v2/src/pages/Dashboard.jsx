@@ -1,5 +1,6 @@
 import React from "react";
-import VoiceWorkspace from "../components/VoiceWorkspace";
+// Change this line to use a capital S:
+import VoiceWorkspace from "../components/VoiceWorkSpace";
 
 function Dashboard({ onLogout, showToast }) {
     return (
