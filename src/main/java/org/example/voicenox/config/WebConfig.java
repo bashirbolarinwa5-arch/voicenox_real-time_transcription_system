@@ -39,20 +39,22 @@ public class WebConfig {
 
 
 
+
+    // 2. Update your securityFilterChain method to look exactly like this:
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-
-                // UPDATE THIS LINE to explicitly use your configuration bean:
+                // 1. PLACE CORS AT THE ABSOLUTE ENTRY POINT OF SPRING SECURITY
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .csrf(csrf -> csrf.disable())
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // ADD THIS LINE AT THE VERY TOP OF THE MATCHERS:
+                        // 2. EXPLICITLY ALLOW ALL PREFLIGHT OPTIONS REQUESTS
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
@@ -61,17 +63,10 @@ public class WebConfig {
                         .anyRequest().authenticated()
                 )
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/ws/voice/**").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
