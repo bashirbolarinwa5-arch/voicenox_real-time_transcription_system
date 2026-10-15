@@ -1,6 +1,6 @@
 const WS_BASE_URL =
     import.meta.env.VITE_WS_URL ||
-    "ws://localhost:1999";
+    "https://voicenox-real-time-transcription-system-5.onrender.com";
 
 
 /*
