@@ -147,7 +147,8 @@ public class WebConfig {
                 List.of(
                         "http://localhost:5173",
                         "http://localhost:5174",
-                        "http://localhost:4173"
+                        "http://localhost:4173",
+                        "https://voicenox-real-time-transcription-system-5.onrender.com"
 
 
                 )
