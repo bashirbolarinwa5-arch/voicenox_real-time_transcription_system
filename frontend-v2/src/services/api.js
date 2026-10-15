@@ -1,7 +1,7 @@
 import { apiFetch } from "./http";
 
 const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:1999";
+    import.meta.env.VITE_API_BASE_URL || "https://voicenox-real-time-transcription-system-5.onrender.com";
 
 
 /*
