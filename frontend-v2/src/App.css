@@ -3238,8 +3238,8 @@
    VOICENOX — CONSOLIDATED MOBILE LAYOUT
    Keep this block at the very bottom of App.css.
    ========================================================= */
-
-@media (max-width: 760px) {
+@media (max-width: 760px),
+(hover: none) and (pointer: coarse) and (orientation: portrait) {
   html,
   body,
   #root {
@@ -3249,7 +3249,6 @@
     min-height: 100%;
     overflow-x: clip;
   }
-
   *,
   *::before,
   *::after {
