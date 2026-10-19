@@ -3105,3 +3105,510 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+
+
+/* VoiceNox mobile layout */
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .voice-workspace {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: 40vh;
+    max-height: 40dvh;
+    flex: 0 0 auto;
+    overflow-y: auto;
+    border-right: none;
+    border-bottom: 1px solid #1b1e29;
+  }
+
+  .workspace-main {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .workspace-header {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .current-note {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 6px;
+  }
+
+  .header-button {
+    min-width: 0;
+    width: 100%;
+    min-height: 40px;
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  .workspace-scroll {
+    padding: 14px 12px 28px;
+    overflow: visible;
+  }
+
+  .voice-status-bar,
+  .workspace-message,
+  .transcript-card,
+  .recording-controls {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .orb-section {
+    width: 100%;
+    min-height: 280px;
+    height: auto;
+    padding: 12px 0;
+  }
+
+  .voice-orb-container {
+    transform: scale(0.78);
+  }
+
+  .recording-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .recording-controls > button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Keep note actions accessible on touch screens. */
+  .note-actions {
+    flex-shrink: 0;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .note-actions button {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .note-item,
+  .note-information {
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   VOICENOX — CONSOLIDATED MOBILE LAYOUT
+   Keep this block at the very bottom of App.css.
+   ========================================================= */
+
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* Stack the sidebar and workspace vertically */
+  .voice-workspace {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  /* Sidebar and note list */
+  .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0;
+    flex: 0 0 auto;
+    padding: 14px;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid #252936;
+  }
+
+  .notes-list {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-height: 180px;
+    flex: 0 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .note-item {
+    width: 100%;
+    min-width: 0;
+    gap: 7px;
+    padding: 9px;
+  }
+
+  .note-icon {
+    flex-shrink: 0;
+    margin-right: 0;
+  }
+
+  .note-information {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  /* Keep rename and delete visible without hover */
+  .note-actions {
+    display: flex !important;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .note-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    border-radius: 8px;
+    touch-action: manipulation;
+  }
+
+  .note-actions .note-delete {
+    color: #ff8585;
+    background: rgba(239, 68, 68, 0.10);
+  }
+
+  .note-actions .note-delete:active {
+    background: rgba(239, 68, 68, 0.20);
+  }
+
+  /* Audio history */
+  .audio-history {
+    margin-top: 14px;
+  }
+
+  .audio-history-list {
+    max-height: 160px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .sidebar-recording {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+  }
+
+  .sidebar-recording-info {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .sidebar-recording-delete {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: #ff8585;
+    background: rgba(239, 68, 68, 0.10);
+    border-radius: 8px;
+    touch-action: manipulation;
+  }
+
+  /* Main workspace */
+  .workspace-main {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0 !important;
+    flex: 1 1 auto;
+    overflow: visible;
+  }
+
+  .workspace-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+  }
+
+  .current-note {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .current-note h1 {
+    max-width: 100%;
+    font-size: 19px;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .header-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    height: auto;
+    padding: 8px 4px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+
+  /* Let the entire page scroll naturally */
+  .workspace-scroll {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+    padding: 14px 12px 28px;
+    overflow: visible;
+  }
+
+  .voice-status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: 42px;
+    margin: 0 0 14px;
+    padding: 10px;
+  }
+
+  .status-left,
+  .status-right {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .workspace-message,
+  .orb-section,
+  .voice-area,
+  .transcript-card,
+  .recording-controls {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .workspace-message {
+    gap: 10px;
+  }
+
+  /* Keep the animated orb centred and contained */
+  .orb-section,
+  .voice-area {
+    height: auto;
+    min-height: 0;
+    padding: 12px 0 18px;
+  }
+
+  .voice-area-heading {
+    padding: 0 8px;
+  }
+
+  .voice-area-heading h2 {
+    font-size: 20px;
+  }
+
+  .voice-orb-container {
+    width: 250px;
+    max-width: 100%;
+    flex-shrink: 0;
+    margin: 8px 0;
+    transform: scale(0.78);
+    transform-origin: center;
+  }
+
+  /* Transcript */
+  .transcript-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .transcript-card-header {
+    gap: 10px;
+    padding: 15px 14px;
+  }
+
+  .transcript-card textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 180px;
+    padding: 14px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  /* Recording controls */
+  .recording-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+    margin: 16px 0 24px;
+  }
+
+  .recording-controls > button {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+  }
+
+  /* Recorded audio cards */
+  .recordings-panel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+  }
+
+  .recording-card {
+    min-width: 0;
+    padding: 10px;
+  }
+
+  .recording-number {
+    width: 28px;
+  }
+
+  .recording-content {
+    min-width: 0;
+  }
+
+  .recording-top {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .recording-top > div {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .custom-audio-player {
+    width: 100%;
+    min-width: 0;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .audio-time {
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .audio-progress-wrapper {
+    min-width: 0;
+  }
+
+  /* Rename modal */
+  .rename-modal-overlay {
+    padding: 12px;
+  }
+
+  .rename-modal {
+    width: 100%;
+    max-width: 430px;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .rename-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .rename-cancel-button,
+  .rename-save-button {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  /* Mobile toast */
+  .toast-container {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+}

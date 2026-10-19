@@ -1,19 +1,19 @@
-import React, { useState, useRef } from "react";
+
+import React, { useRef, useState } from "react";
 import { getAudioUrl } from "../services/api";
 
 function Sidebar({
-                     notes,
+                     notes = [],
                      selectedNote,
                      onSelectNote,
                      onCreateNote,
                      onDeleteNote,
                      onRenameNote,
-                     searchValue,
+                     searchValue = "",
                      onSearchChange,
                      recordings = [],
-                     onDeleteRecording
+                     onDeleteRecording,
                  }) {
-
     const [showAudioHistory, setShowAudioHistory] = useState(true);
     const [playingId, setPlayingId] = useState(null);
 
@@ -22,431 +22,287 @@ function Sidebar({
     }
 
     function handlePause(recordingId) {
-        setPlayingId((currentId) => {
-            if (currentId === recordingId) {
-                return null;
-            }
-
-            return currentId;
-        });
+        setPlayingId((currentId) =>
+            currentId === recordingId ? null : currentId
+        );
     }
 
     return (
         <aside className="sidebar">
-
             {/* BRAND */}
             <div className="sidebar-brand">
-
-                <div className="brand-mark">
-                    <span></span>
+                <div className="brand-mark" aria-hidden="true">
+                    <span />
                 </div>
 
                 <div>
                     <h2>VoiceNox</h2>
                     <span>Voice workspace</span>
                 </div>
-
             </div>
-
 
             {/* NOTES HEADER */}
             <div className="sidebar-header">
-
                 <div>
                     <h3>My Notes</h3>
-
                     <span>
-                        {notes.length} notes
+                        {notes.length} {notes.length === 1 ? "note" : "notes"}
                     </span>
                 </div>
 
                 <button
                     className="new-note-button"
+                    type="button"
                     onClick={onCreateNote}
                     title="Create new note"
+                    aria-label="Create new note"
                 >
                     +
                 </button>
-
             </div>
-
 
             {/* SEARCH */}
             <div className="search-box">
-
-                <span>⌕</span>
+                <span aria-hidden="true">⌕</span>
 
                 <input
-                    type="text"
+                    type="search"
                     placeholder="Search notes..."
                     value={searchValue}
-                    onChange={(e) =>
-                        onSearchChange(e.target.value)
+                    onChange={(event) =>
+                        onSearchChange?.(event.target.value)
                     }
+                    aria-label="Search notes"
                 />
-
             </div>
 
-
-            {/* NOTES */}
+            {/* NOTES LIST */}
             <div className="notes-list">
-
                 {notes.length === 0 ? (
-
                     <div className="empty-notes">
-
-                        <div className="empty-icon">
+                        <div className="empty-icon" aria-hidden="true">
                             ◇
                         </div>
 
                         <p>No notes yet</p>
 
-                        <span>
-                            Create your first voice note
-                        </span>
-
+                        <span>Create your first voice note</span>
                     </div>
-
                 ) : (
+                    notes.map((note) => {
+                        const title = note.title || "Untitled Note";
+                        const isSelected = selectedNote?.id === note.id;
 
-                    notes.map((note) => (
+                        return (
+                            <div
+                                key={note.id}
+                                className={`note-item ${isSelected ? "active" : ""}`}
+                                onClick={() => onSelectNote?.(note)}
+                            >
+                                <div className="note-icon" aria-hidden="true">
+                                    ◇
+                                </div>
 
-                        <div
-                            key={note.id}
-                            className={`note-item ${
-                                selectedNote?.id === note.id
-                                    ? "active"
-                                    : ""
-                            }`}
-                            onClick={() =>
-                                onSelectNote(note)
-                            }
-                        >
+                                <div className="note-information">
+                                    <strong title={title}>{title}</strong>
 
-                            <div className="note-icon">
-                                ◇
+                                    <span title={note.text || ""}>
+                                        {note.text
+                                            ? note.text.substring(0, 55)
+                                            : "No transcription yet"}
+                                    </span>
+                                </div>
+
+                                {/* NOTE ACTIONS: one Rename and one Delete */}
+                                <div className="note-actions">
+                                    <button
+                                        className="note-rename"
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onRenameNote?.(note);
+                                        }}
+                                        title="Rename note"
+                                        aria-label={`Rename ${title}`}
+                                    >
+                                        ✎
+                                    </button>
+
+                                    <button
+                                        className="note-delete"
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onDeleteNote?.(note.id);
+                                        }}
+                                        title="Delete note"
+                                        aria-label={`Delete ${title}`}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
                             </div>
-
-                            <div className="note-information">
-
-                                <strong>
-                                    {note.title ||
-                                        "Untitled Note"}
-                                </strong>
-
-                                <span>
-                                    {note.text
-                                        ? note.text.substring(
-                                            0,
-                                            55
-                                        )
-                                        : "No transcription yet"}
-                                </span>
-
-                            </div>
-
-
-                            <div className="note-actions">
-
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onRenameNote(note);
-                                    }}
-                                    title="Rename note"
-                                >
-                                    ✎
-                                </button>
-
-
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteNote(note.id);
-                                    }}
-                                    title="Delete note"
-                                >
-                                    ×
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    ))
-
+                        );
+                    })
                 )}
-
             </div>
-
 
             {/* AUDIO HISTORY */}
             <div className="audio-history">
-
                 <button
                     className="audio-history-header"
+                    type="button"
                     onClick={() =>
-                        setShowAudioHistory(
-                            (previous) => !previous
-                        )
+                        setShowAudioHistory((previous) => !previous)
                     }
+                    aria-expanded={showAudioHistory}
+                    aria-controls="voice-nox-audio-history-list"
                 >
-
                     <div className="audio-history-title">
-
-                        <span className="audio-history-icon">
+                        <span
+                            className="audio-history-icon"
+                            aria-hidden="true"
+                        >
                             ◉
                         </span>
 
                         <div>
-
-                            <strong>
-                                Audio History
-                            </strong>
+                            <strong>Audio History</strong>
 
                             <span>
-                                {recordings.length} recording
-                                {recordings.length !== 1
-                                    ? "s"
-                                    : ""}
+                                {recordings.length}{" "}
+                                {recordings.length === 1
+                                    ? "recording"
+                                    : "recordings"}
                             </span>
-
                         </div>
-
                     </div>
-
 
                     <span
                         className={`audio-history-chevron ${
-                            showAudioHistory
-                                ? "open"
-                                : ""
+                            showAudioHistory ? "open" : ""
                         }`}
+                        aria-hidden="true"
                     >
                         ˅
                     </span>
-
                 </button>
 
-
                 {showAudioHistory && (
-
-                    <div className="audio-history-list">
-
+                    <div
+                        className="audio-history-list"
+                        id="voice-nox-audio-history-list"
+                    >
                         {!selectedNote ? (
-
                             <div className="audio-history-empty">
-
-                                <span>
-                                    Select a note
-                                </span>
-
-                                <small>
-                                    Recordings will appear here
-                                </small>
-
+                                <span>Select a note</span>
+                                <small>Recordings will appear here</small>
                             </div>
-
                         ) : recordings.length === 0 ? (
-
                             <div className="audio-history-empty">
-
-                                <span>
-                                    No recordings yet
-                                </span>
-
-                                <small>
-                                    Start speaking to create one
-                                </small>
-
+                                <span>No recordings yet</span>
+                                <small>Start speaking to create one</small>
                             </div>
-
                         ) : (
-
-                            recordings.map(
-                                (recording, index) => (
-
-                                    <SidebarRecording
-                                        key={recording.id}
-                                        recording={recording}
-                                        index={index}
-                                        playingId={playingId}
-                                        onPlay={handlePlay}
-                                        onPause={handlePause}
-                                        onDelete={
-                                            onDeleteRecording
-                                        }
-                                    />
-
-                                )
-                            )
-
+                            recordings.map((recording, index) => (
+                                <SidebarRecording
+                                    key={recording.id}
+                                    recording={recording}
+                                    index={index}
+                                    playingId={playingId}
+                                    onPlay={handlePlay}
+                                    onPause={handlePause}
+                                    onDelete={onDeleteRecording}
+                                />
+                            ))
                         )}
-
                     </div>
-
                 )}
-
             </div>
-
         </aside>
     );
 }
 
-
-/*
- * Recording item inside Audio History
- */
 function SidebarRecording({
                               recording,
                               index,
                               playingId,
                               onPlay,
                               onPause,
-                              onDelete
+                              onDelete,
                           }) {
-
-    const audioUrl = getAudioUrl(
-        recording.audioUrl
-    );
-
     const audioRef = useRef(null);
+    const audioUrl = getAudioUrl(recording.audioUrl);
+    const isPlaying = playingId === recording.id;
 
-    function toggleAudio(event) {
-
+    async function toggleAudio(event) {
         event.stopPropagation();
 
         const audio = audioRef.current;
-
-        if (!audio) {
-            return;
-        }
+        if (!audio) return;
 
         if (audio.paused) {
-
-            /*
-             * Start the actual audio.
-             *
-             * The onPlay event below will update
-             * the React state.
-             */
-            audio.play().catch((error) => {
-
-                console.error(
-                    "Could not play recording:",
-                    error
-                );
-
-                onPause(recording.id);
-
-            });
-
+            try {
+                await audio.play();
+            } catch (error) {
+                console.error("Could not play recording:", error);
+            }
         } else {
-
-            /*
-             * Pause the actual audio.
-             *
-             * The onPause event below will update
-             * the React state.
-             */
             audio.pause();
         }
     }
 
-
-    function handlePlay() {
-        onPlay(recording.id);
-    }
-
-
-    function handlePause() {
-        onPause(recording.id);
-    }
-
-
-    function handleEnded() {
-
-        onPause(recording.id);
-
-    }
-
-
     return (
         <div className="sidebar-recording">
-
             <audio
                 ref={audioRef}
                 src={audioUrl}
                 preload="metadata"
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onEnded={handleEnded}
+                onPlay={() => onPlay(recording.id)}
+                onPause={() => onPause(recording.id)}
+                onEnded={() => onPause(recording.id)}
             />
-
 
             <button
                 className={`sidebar-recording-play ${
-                    playingId === recording.id
-                        ? "playing"
-                        : ""
+                    isPlaying ? "playing" : ""
                 }`}
-                onClick={toggleAudio}
                 type="button"
-                title={
-                    playingId === recording.id
-                        ? "Pause recording"
-                        : "Play recording"
-                }
+                onClick={toggleAudio}
+                title={isPlaying ? "Pause recording" : "Play recording"}
                 aria-label={
-                    playingId === recording.id
-                        ? "Pause recording"
-                        : "Play recording"
+                    isPlaying
+                        ? `Pause recording ${index + 1}`
+                        : `Play recording ${index + 1}`
                 }
             >
-
-                {playingId === recording.id
-                    ? "❚❚"
-                    : "▶"}
-
+                {isPlaying ? "❚❚" : "▶"}
             </button>
 
-
             <div className="sidebar-recording-info">
+                <strong>Recording {index + 1}</strong>
 
-                <strong>
-                    Recording {index + 1}
-                </strong>
-
-                <span>
+                <span title={recording.transcription || ""}>
                     {recording.transcription
-                        ? recording.transcription.substring(
-                            0,
-                            42
-                        )
+                        ? recording.transcription.substring(0, 42)
                         : "No transcription"}
                 </span>
-
             </div>
-
 
             <button
                 className="sidebar-recording-delete"
+                type="button"
                 onClick={(event) => {
-
                     event.stopPropagation();
-
-                    onDelete(recording.id);
-
+                    onDelete?.(recording.id);
                 }}
                 title="Delete recording"
-                type="button"
+                aria-label={`Delete recording ${index + 1}`}
             >
                 ×
             </button>
-
         </div>
     );
 }
-
 
 export default Sidebar;
